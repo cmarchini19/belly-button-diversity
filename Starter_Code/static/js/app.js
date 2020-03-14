@@ -27,30 +27,39 @@ function init() {
 init();
 
 
-// Build Bar charts
+// Build Bar chart
 
-function buildcharts(sampleID) {
+function buildbarchart(sampleID) {
     d3.json("samples.json").then(function(data) {
+        // Data for bar chart
         var samples = data.samples
         var samplearray = samples.filter(sample => sample.id == sampleID);
         var result = samplearray[0]
             console.log(result)
-            var otu_labels = result.otu_labels
-            var otu_ids = result.otu_ids
-            var sample_values = result.sample_values
-            var barchart = {
-                x: sample_values.slice(0, 10),
-                y: otu_ids.slice(0, 10),
-                text: otu_labels.slice(0, 10),
-                type: "bar"
+        var sample_values = result.sample_values;
+        var otu_ids = result.otu_ids;
+        var otu_labels = result.otu_labels;
+       
+        // Establish bar chart var
+        var barchart = {
+            x: sample_values.slice(0, 10).reverse(),
+            y: otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
+            text: otu_labels.slice(0, 10).reverse(),
+            type: "bar",
+            orientation: "h",
             }
-            var data = [barchart]
-            Plotly.newPlot("bar", data);
+
+        // Set-up data and layout var followed by PlotLy
+        var data = [barchart]
+        var layout = {
+            margin: {t: 30, l: 150} 
+        }
+        Plotly.newPlot("bar", data, layout);
     })
 }
 
 function optionChanged(newSample) {
-    buildcharts(newSample);
+    buildbarchart(newSample);
     // add function for metadata here
 }
 
