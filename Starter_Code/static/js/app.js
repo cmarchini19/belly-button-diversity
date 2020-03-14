@@ -27,11 +27,11 @@ function init() {
 init();
 
 
-// Build Bar chart
+// Build Bar and Bubble chart
 
-function buildbarchart(sampleID) {
+function buildcharts(sampleID) {
     d3.json("samples.json").then(function(data) {
-        // Data for bar chart
+        // Data for charts
         var samples = data.samples
         var samplearray = samples.filter(sample => sample.id == sampleID);
         var result = samplearray[0]
@@ -49,18 +49,40 @@ function buildbarchart(sampleID) {
             orientation: "h",
             }
 
-        // Set-up data and layout var followed by PlotLy
-        var data = [barchart]
-        var layout = {
+        // Establish bubble chart var
+        var bubblechart = {
+            x: otu_ids,
+            y: sample_values,
+            text: otu_labels,
+            mode: 'markers',
+            marker: {
+                color: otu_ids,
+                size: sample_values
+            }
+        };
+        
+         // Set-up bar chart data and layout var for PlotLy
+        var bardata = [barchart]
+        var barlayout = {
             margin: {t: 30, l: 150} 
+
         }
-        Plotly.newPlot("bar", data, layout);
-    })
+       
+        // Set-up bubble chart data and layout var for PlotLy
+        var bubbledata = [bubblechart]
+        var bubblelayout = {
+            height: 600,
+            width: 1000
+        }
+    
+        // Plotly Charts
+        Plotly.newPlot("bar", bardata, barlayout);
+        Plotly.newPlot("bubble", bubbledata, bubblelayout)
+    });
 }
 
 function optionChanged(newSample) {
-    buildbarchart(newSample);
+    buildcharts(newSample);
     // add function for metadata here
 }
 
-// Build Bubble Chart
