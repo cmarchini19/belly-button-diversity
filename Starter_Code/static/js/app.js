@@ -1,17 +1,9 @@
-// 1. Use the D3 library to read in `samples.json`.
+// Use the D3 library to read in `samples.json`.
 d3.json("samples.json").then(function(data) {
     console.log(data)
 });
 
-// 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
-    // Use `sample_values` as the values for the bar chart.
-
-    // * Use `otu_ids` as the labels for the bar chart.
-
-    // * Use `otu_labels` as the hovertext for the chart.
-
 // Initialize drop down menu for Test Subject ID Nos. 
-
 function init() {
     var dropdownMenu = d3.select("#selDataset");
     d3.json("samples.json").then(function(data) {
@@ -26,9 +18,7 @@ function init() {
 }
 init();
 
-
-// Build Bar and Bubble chart
-
+// Build charts: bar chart, bubble chart, gauge chart (optional)
 function buildcharts(sampleID) {
     d3.json("samples.json").then(function(data) {
         // Data for charts
@@ -64,15 +54,20 @@ function buildcharts(sampleID) {
          // Set-up bar chart data and layout var for PlotLy
         var bardata = [barchart]
         var barlayout = {
-            margin: {t: 30, l: 150} 
-
+            title: "Top 10 OTUs for Test Subject",
+            xaxis: { title: "Sample Values"},
+            yaxis: { title: "OTU IDs"},
+            margin: {t: 30, l: 150}
         }
        
         // Set-up bubble chart data and layout var for PlotLy
         var bubbledata = [bubblechart]
         var bubblelayout = {
+            title: "Samples for Test Subject",
+            xaxis: { title: "OTU IDs"},
+            yaxis: { title: "Sample Values"},
             height: 600,
-            width: 1000
+            width: 1200
         }
     
         // Plotly Charts
@@ -81,8 +76,49 @@ function buildcharts(sampleID) {
     });
 }
 
+// Build demographics metadata table
+function buildmetadata(demodata) {
+    var metaData = d3.select("#sample-metadata")
+    d3.json("samples.json").then(function(data) {
+            console.log(data.metadata)
+
+        //Establish metadata variable
+        var metadata = data.metadata
+        
+        //Make sure filter pulls on id we have selected  
+        var samples = data.metadata;
+        var samplearray = samples.filter(sample => sample.id == demodata);
+        var result = samplearray[0]
+            console.log(result)
+        var currentid = result.id;
+        
+        //Reset the data 
+        metaData.html("")
+
+        // Filter Metadata down for Current ID
+        var currentmeta = metadata.filter(s => {return +s.id === +currentid}); 
+
+        //Append meta data list
+        metaData.append('div')
+            .text(`id: ${currentmeta.map(meta => meta.id)}`)
+        metaData.append('div')
+            .text(`ethnicity: ${currentmeta.map(meta => meta.ethnicity)}`)
+        metaData.append('div')
+            .text(`gender: ${currentmeta.map(meta => meta.gender)}`)
+        metaData.append('div')
+            .text(`age: ${currentmeta.map(meta => meta.age)}`)
+        metaData.append('div')
+            .text(`location: ${currentmeta.map(meta => meta.location)}`)
+        metaData.append('div')
+            .text(`bbtype: ${currentmeta.map(meta => meta.bbtype)}`)
+        metaData.append('div')
+            .text(`wfreq: ${currentmeta.map(meta => meta.wfreq)}`)
+    });
+}
+
+//Test Subject Dashboard Updates
 function optionChanged(newSample) {
     buildcharts(newSample);
-    // add function for metadata here
+    buildmetadata(newSample);
 }
 
